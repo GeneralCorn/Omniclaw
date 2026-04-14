@@ -252,6 +252,10 @@ async function buildContainerArgs(
   // Pass host timezone so container's local time matches the user's
   args.push('-e', `TZ=${TIMEZONE}`);
 
+  if (process.env.GITHUB_PAT) {
+    args.push('-e', `GITHUB_PAT=${process.env.GITHUB_PAT}`);
+  }
+
   // OneCLI gateway handles credential injection — containers never see real secrets.
   // The gateway intercepts HTTPS traffic and injects API keys or OAuth tokens.
   const onecliApplied = await onecli.applyContainerConfig(args, {
@@ -303,6 +307,31 @@ export async function runContainerAgent(
 
   const groupDir = resolveGroupFolderPath(group.folder);
   fs.mkdirSync(groupDir, { recursive: true });
+
+  const groupMcpFile = path.join(groupDir, '.mcp.json');
+  fs.writeFileSync(
+    groupMcpFile,
+    JSON.stringify(
+      {
+        mcpServers: {
+          google_workspace: {
+            type: 'http',
+            url: 'http://host.docker.internal:8001/mcp',
+          },
+          github: {
+            type: 'stdio',
+            command: 'npx',
+            args: ['-y', '@modelcontextprotocol/server-github'],
+            env: {
+              GITHUB_PERSONAL_ACCESS_TOKEN: '${GITHUB_PAT}',
+            },
+          },
+        },
+      },
+      null,
+      2,
+    ) + '\n',
+  );
 
   const mounts = buildVolumeMounts(group, input.isMain);
   const safeName = group.folder.replace(/[^a-zA-Z0-9-]/g, '-');

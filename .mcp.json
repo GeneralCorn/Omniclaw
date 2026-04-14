@@ -1,3 +1,11 @@
 {
-  "mcpServers": {}
+  "mcpServers": {
+    "computeedge": {
+      "type": "sse",
+      "url": "https://mcp.baadalai.com/sse",
+      "headers": {
+        "Authorization": "Bearer ${BAADAL_TOKEN}"
+      }
+    }
+  }
 }
