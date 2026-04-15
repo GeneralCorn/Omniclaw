@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/omniclaw-logo.png" alt="Omniclaw" width="200">
+  <img src="assets/omniclaw-logo.png" alt="Omniclaw" width="400">
 </p>
 
 <p align="center">
