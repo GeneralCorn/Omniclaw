@@ -116,20 +116,6 @@ Created via `mcp__nanoclaw__schedule_task` from inside Discord on first run:
 | Weekly review             | `0 9 * * 5`  | all                                                                          |
 | Prediction markets scrape | `30 7 * * *` | `prediction-markets`                                                         |
 
-## On-Demand Commands
-
-Sent to `@Andy` in Discord:
-
-```
-@Andy portfolio
-@Andy news
-@Andy what should I work on
-@Andy I'm overwhelmed
-@Andy quiz me on CS 477 formal methods
-@Andy when should I leave for class
-@Andy update my portfolio: 10 NVDA @ 142, 5 MSFT @ 410
-```
-
 ## Architecture
 
 Unchanged from upstream NanoClaw — single Node.js process, per-group containers, filesystem isolation.
