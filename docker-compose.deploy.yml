@@ -1,0 +1,51 @@
+services:
+  omniclaw:
+    build:
+      context: .
+      dockerfile: Dockerfile.orchestrator
+    image: omniclaw:latest
+    container_name: omniclaw
+    restart: unless-stopped
+    working_dir: /opt/omniclaw
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/omniclaw:/opt/omniclaw
+    environment:
+      TZ: "America/Chicago"
+      NODE_ENV: "production"
+      ASSISTANT_NAME: "Andy"
+      CONTAINER_IMAGE: "nanoclaw-agent:latest"
+      LOG_LEVEL: "info"
+      DISCORD_BOT_TOKEN: "${DISCORD_BOT_TOKEN}"
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY}"
+      GITHUB_PAT: "${GITHUB_PAT}"
+      GOOGLE_OAUTH_CLIENT_ID: "${GOOGLE_OAUTH_CLIENT_ID}"
+      GOOGLE_OAUTH_CLIENT_SECRET: "${GOOGLE_OAUTH_CLIENT_SECRET}"
+      OAUTHLIB_INSECURE_TRANSPORT: "1"
+      CUMTD_API_KEY: "${CUMTD_API_KEY}"
+      OPENWEATHER_API_KEY: "${OPENWEATHER_API_KEY}"
+      BAADAL_TOKEN: "${BAADAL_TOKEN}"
+    depends_on:
+      - workspace-mcp
+
+  workspace-mcp:
+    image: ghcr.io/astral-sh/uv:python3.13-bookworm-slim
+    container_name: workspace-mcp
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "8001"
+      GOOGLE_OAUTH_CLIENT_ID: "${GOOGLE_OAUTH_CLIENT_ID}"
+      GOOGLE_OAUTH_CLIENT_SECRET: "${GOOGLE_OAUTH_CLIENT_SECRET}"
+      OAUTHLIB_INSECURE_TRANSPORT: "1"
+    volumes:
+      - google-workspace-creds:/root/.google_workspace_mcp
+    command: >
+      uvx workspace-mcp
+      --tools gmail drive calendar tasks
+      --transport streamable-http
+
+volumes:
+  google-workspace-creds:

@@ -1,0 +1,27 @@
+# Omniclaw Orchestrator Image
+# This is the main Node.js process that polls Discord and spawns agent containers.
+# Distinct from container/Dockerfile, which is the agent container image.
+
+FROM node:22-slim
+
+# Docker CLI is required so the orchestrator can spawn agent containers
+# via the mounted /var/run/docker.sock on the host.
+RUN apt-get update && apt-get install -y \
+    docker.io \
+    git \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Match absolute path on host so volume mounts Docker passes to sibling
+# agent containers resolve to real host paths.
+WORKDIR /opt/omniclaw
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+CMD ["node", "dist/index.js"]
